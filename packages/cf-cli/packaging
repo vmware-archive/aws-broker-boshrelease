@@ -1,0 +1,18 @@
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# We grab the latest versions that are in the directory
+CF_CLI_VERSION=`ls -r cf-cli/cf-cli* | sed 's/cf-cli\/cf-cli_\(.*\)_linux_x86-64.tgz/\1/' | head -1`
+
+# Extract Cloud Foundry CLI package
+echo "Extracting Cloud Foundry CLI ${CF_CLI_VERSION}..."
+tar xzvf ${BOSH_COMPILE_TARGET}/cf-cli/cf-cli_${CF_CLI_VERSION}_linux_x86-64.tgz
+if [[ $? != 0 ]] ; then
+  echo "Failed extracting Cloud Foundry CLI ${CF_CLI_VERSION}"
+  exit 1
+fi
+
+# Copy Cloud Foundry CLI package
+echo "Copying Cloud Foundry CLI..."
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+cp -a ${BOSH_COMPILE_TARGET}/cf ${BOSH_INSTALL_TARGET}/bin

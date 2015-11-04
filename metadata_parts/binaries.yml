@@ -1,0 +1,12 @@
+---
+stemcell_criteria:
+  os: ubuntu-trusty
+  version: "3100"
+  requires_cpi: false
+
+releases:
+  - name: aws-broker
+    file: aws-broker-1.tgz
+    version: "1"
+    md5: faaaaf08d23d6fde1bc571dc6a4244e6
+    url: https://storage.googleapis.com/pivotal/aws-broker-1.tgz

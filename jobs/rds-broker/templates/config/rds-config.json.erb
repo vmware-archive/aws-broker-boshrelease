@@ -1,0 +1,13 @@
+{
+  "log_level": "<%= p('rds-broker.log_level') %>",
+  "username": "<%= p('rds-broker.username') %>",
+  "password": "<%= p('rds-broker.password') %>",
+  "rds_config": {
+    "region": "<%= p('rds-broker.aws_region') %>",
+    "db_prefix": "<%= p('rds-broker.db_prefix') %>",
+    "allow_user_provision_parameters": <%= p('rds-broker.allow_user_provision_parameters') %>,
+    "allow_user_update_parameters": <%= p('rds-broker.allow_user_update_parameters') %>,
+    "allow_user_bind_parameters": <%= p('rds-broker.allow_user_bind_parameters') %>,
+    "catalog": <%= JSON.dump(p('rds-broker.catalog')) %>
+  }
+}

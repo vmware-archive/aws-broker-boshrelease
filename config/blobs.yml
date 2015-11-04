@@ -1,0 +1,25 @@
+---
+cf-cli/cf-cli_6.13.0_linux_x86-64.tgz:
+  object_id: 117d6d15-626c-4aeb-a4bc-4e3b96671d56
+  sha: 82c5774aa44af9d091d3461adfb61bdadd64aad3
+  size: 5486088
+golang/go1.5.1.linux-amd64.tar.gz:
+  object_id: 11ae530c-2e4e-40b0-9f41-43da0df71fa5
+  sha: 46eecd290d8803887dec718c691cc243f2175fe0
+  size: 77875767
+ruby/bundler-1.10.6.gem:
+  object_id: 6fc7b871-2c90-4de2-8e35-43fca2047b83
+  sha: 55a37fccd1c0cb5542d468e35d3be46dd0667f73
+  size: 251392
+ruby/ruby-2.2.3.tar.gz:
+  object_id: 0c74c166-9876-4520-a234-5e5764beb4e6
+  sha: 0d9e158534cb31e72740138b8f697b57b448e5c3
+  size: 16626772
+ruby/rubygems-2.5.0.tgz:
+  object_id: 725e1032-468f-488a-becd-2d08109a574f
+  sha: 03613d7013b61ecabef2424221438a692e53bbfc
+  size: 467978
+ruby/yaml-0.1.6.tar.gz:
+  object_id: 9cb69063-ead6-4336-b536-3a28556ab1dd
+  sha: f3d404e11bec3c4efcddfd14c42d46f1aabe0b5d
+  size: 503012

@@ -1,0 +1,209 @@
+<%
+deployment_name = "aws-broker"
+director_uuid = "CHANGE-ME"
+aws_access_key_id = "CHANGE-ME"
+aws_secret_access_key = "CHANGE-ME"
+aws_region = "CHANGE-ME"
+%>
+---
+name: <%= deployment_name %>
+director_uuid: <%= director_uuid %>
+
+releases:
+  - name: aws-broker
+    version: latest
+
+compilation:
+  workers: 3
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties: {}
+
+update:
+  canaries: 0
+  canary_watch_time: 30000-60000
+  update_watch_time: 30000-60000
+  max_in_flight: 32
+  serial: false
+
+networks:
+  - name: default
+    type: manual
+    subnets:
+      - cloud_properties: {}
+        range: 10.244.0.0/24
+        reserved:
+          - 10.244.0.1
+        static:
+          - 10.244.0.2
+          - 10.244.0.3
+          - 10.244.0.4
+
+resource_pools:
+  - name: default
+    network: default
+    stemcell:
+      name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+      version: latest
+    cloud_properties: {}
+
+jobs:
+  - name: cloudformation-broker
+    templates:
+      - name: cloudformation-broker
+    instances: 1
+    resource_pool: default
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips:
+          - 10.244.0.2
+
+  - name: rds-broker
+    templates:
+      - name: rds-broker
+    instances: 1
+    resource_pool: default
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips:
+          - 10.244.0.3
+
+  - name: sqs-broker
+    templates:
+      - name: sqs-broker
+    instances: 1
+    resource_pool: default
+    networks:
+      - name: default
+        default: [dns, gateway]
+        static_ips:
+          - 10.244.0.4
+
+properties:
+  cloudformation-broker:
+    aws_access_key_id: "<%= aws_access_key_id %>"
+    aws_secret_access_key: "<%= aws_secret_access_key %>"
+    aws_region: "<%= aws_region %>"
+    catalog:
+      services:
+        - id: "91a53118-16fd-4865-b273-0257dbea0fe8"
+          name: "s3"
+          description: "Amazon Simple Storage Service (S3)"
+          bindable: true
+          tags:
+            - "s3"
+          metadata:
+            displayName: "AWS S3"
+            imageUrl: "data:image/png;base64,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"
+            longDescription: "Amazon Simple Storage Service (S3)"
+            providerDisplayName: "Amazon Web Services"
+            documentationUrl: "https://aws.amazon.com/documentation/s3/"
+            supportUrl: "https://forums.aws.amazon.com/forum.jspa?forumID=24"
+          plan_updateable: true
+          plans:
+            - id: "fa5b59d8-e137-48b8-b696-6100d9cea722"
+              name: "bucket"
+              description: "Amazon S3 Bucket"
+              metadata:
+                costs:
+                  - amount:
+                      usd: 0.03
+                    unit: "Gigabyte"
+                bullets:
+                  - "Dedicated AWS S3 bucket"
+                  - "AWS S3"
+              cloudformation_properties:
+                capabilities:
+                  - "CAPABILITY_IAM"
+                on_failure: "ROLLBACK"
+                template_url: "https://s3.amazonaws.com/aws-cloudformation-service-broker/sample-s3-cftemplate.json"
+                timeout_in_minutes: 10
+
+  rds-broker:
+    aws_access_key_id: "<%= aws_access_key_id %>"
+    aws_secret_access_key: "<%= aws_secret_access_key %>"
+    aws_region: "<%= aws_region %>"
+    catalog:
+      services:
+        - id: "ce71b484-d542-40f7-9dd4-5526e38c81ba"
+          name: "rdsmysql"
+          description: "AWS RDS MySQL service"
+          bindable: true
+          tags:
+            - "mysql"
+            - "relational"
+          metadata:
+            displayName: "AWS RDS MySQL"
+            imageUrl: "data:image/png;base64,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"
+            longDescription: "AWS RDS MySQL service"
+            providerDisplayName: "Amazon Web Services"
+            documentationUrl: "https://aws.amazon.com/documentation/rds/"
+            supportUrl: "https://forums.aws.amazon.com/forum.jspa?forumID=60"
+          plan_updateable: true
+          plans:
+            - id: "5b8282cf-a669-4ffc-b426-c169a7bbfc71"
+              name: "5.6-medium"
+              description: "RDS MySQL 5.6 (db.m3.medium, 10Gb)"
+              metadata:
+                costs:
+                  - amount:
+                      usd: 0.180
+                    unit: "HOUR"
+                bullets:
+                  - "Dedicated MySQL 5.6 server"
+                  - "MySQL 5.6"
+                  - "AWS RDS"
+              rds_properties:
+                db_instance_class: "db.m3.medium"
+                engine: "MySQL"
+                engine_version: "5.6.23"
+                allocated_storage: 10
+                auto_minor_version_upgrade: true
+                multi_az: true
+                publicly_accessible: true
+                copy_tags_to_snapshot: true
+                skip_final_snapshot: false
+                db_security_groups:
+                  - "default"
+
+  sqs-broker:
+    aws_access_key_id: "<%= aws_access_key_id %>"
+    aws_secret_access_key: "<%= aws_secret_access_key %>"
+    aws_region: "<%= aws_region %>"
+    catalog:
+      services:
+        - id: "3c5ff4fd-3a27-4e66-a94d-f7d38558405d"
+          name: "awssqs"
+          description: "AWS SQS service"
+          bindable: true
+          tags:
+            - "sqs"
+            - "jms"
+          metadata:
+            displayName: "AWS SQS"
+            imageUrl: "data:image/png;base64,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"
+            longDescription: "AWS Simple Queue Service (SQS)"
+            providerDisplayName: "Amazon Web Services"
+            documentationUrl: "https://aws.amazon.com/documentation/sqs/"
+            supportUrl: "https://forums.aws.amazon.com/forum.jspa?forumID=12"
+          plan_updateable: true
+          plans:
+            - id: "7105c0ec-5238-45d4-a08d-3d682fbb4587"
+              name: "queue"
+              description: "AWS SQS Queue"
+              metadata:
+                costs:
+                  - amount:
+                      usd: 0.50
+                    unit: "per Million Requests"
+                bullets:
+                  - "Dedicated AWS SQS queue"
+                  - "AWS SQS"
+              sqs_properties:
+                delay_seconds: "0"
+                maximum_message_size: "262144"
+                message_retention_period: "345600"
+                receive_message_wait_time_seconds: "0"
+                visibility_timeout: "30"

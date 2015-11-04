@@ -1,0 +1,15 @@
+[submodule "src/github.com/cloudfoundry-incubator/route-registrar"]
+	path = src/github.com/cloudfoundry-incubator/route-registrar
+	url = https://github.com/cloudfoundry-incubator/route-registrar.git
+[submodule "src/broker-registrar"]
+	path = src/broker-registrar
+	url = https://github.com/pivotal-cf/broker-registrar.git
+[submodule "src/github.com/cf-platform-eng/sqs-broker"]
+	path = src/github.com/cf-platform-eng/sqs-broker
+	url = https://github.com/cf-platform-eng/sqs-broker.git
+[submodule "src/github.com/cf-platform-eng/cloudformation-broker"]
+	path = src/github.com/cf-platform-eng/cloudformation-broker
+	url = https://github.com/cf-platform-eng/cloudformation-broker.git
+[submodule "src/github.com/cf-platform-eng/rds-broker"]
+	path = src/github.com/cf-platform-eng/rds-broker
+	url = https://github.com/cf-platform-eng/rds-broker.git
