@@ -8,5 +8,5 @@ releases:
   - name: aws-broker
     file: aws-broker-1.tgz
     version: "1"
-    md5: faaaaf08d23d6fde1bc571dc6a4244e6
+    md5: a6f1a614aa58c75a13ea0eef5e9a7722
     url: https://storage.googleapis.com/pivotal/aws-broker-1.tgz
