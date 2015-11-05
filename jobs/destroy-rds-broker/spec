@@ -1,0 +1,29 @@
+---
+name: destroy-rds-broker
+
+packages:
+  - cf-cli
+
+templates:
+  bin/destroy.erb: bin/run
+
+properties:
+  rds-broker.cf.api_endpoint:
+    description: "CF API endpoint"
+  rds-broker.cf.skip_cert_verify:
+    description: "Whether to verify SSL certs when making API requests"
+    default: false
+  rds-broker.cf.admin_user:
+    description: "CF admin username"
+  rds-broker.cf.admin_password:
+    description: "CF admin password"
+
+  rds-broker.cf.app.organization:
+    description: "Organization from where the RDS Broker application will be deleted"
+    default: "system"
+  rds-broker.cf.app.space:
+    description: "Space from where the RDS Broker application will be deleted"
+    default: "rds-broker"
+  rds-broker.cf.app.name:
+    description: "RDS Broker application name"
+    default: "rds-broker"
