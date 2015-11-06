@@ -62,6 +62,26 @@ form_types:
       - reference: .properties.rds_broker_allow_user_bind_parameters
         label: "Allow user provision parameters"
         description: "Allow or disallow users to send arbitrary parameters on bind calls"
+      - reference: .properties.rds_broker_db_subnet_group_name
+        label: "AWS RDS DB Subnet Group"
+        description: "Enter the AWS RDS DB subnet group name that defines which subnets and IP ranges DB Instances can use in the VPC"
+      - reference: .properties.rds_broker_vpc_security_group_id
+        label: "AWS VPC Security Group ID"
+        description: "Enter the VPC Security Group ID that have rules authorizing connections from applications that need to access the data stored in DB Instances"
+      - reference: .properties.rds_broker_publicly_accessible
+        label: "Publicly Accessible"
+        description: "Specify if DB Instances will be publicly accessible"
+      - reference: .properties.rds_broker_multi_az
+        label: "Multi-AZ Deployment for DB Instances? (recommended for high availability)"
+        selector_property_inputs:
+          - reference: .properties.rds_broker_multi_az.enabled
+            label: "Enabled"
+          - reference: .properties.rds_broker_multi_az.disabled
+            label: "Disabled"
+            property_inputs:
+              - reference: .properties.rds_broker_multi_az.disabled.availability_zone
+                label: "AWS Availability Zone"
+                description: "Enter the Availability Zone where DB Instances will be created in. If not specified, a random, system-chosen Availability Zone in the endpoint's region, will be automatically chosen"
 
   - name: sqs_broker
     label: "AWS SQS Broker Config"
@@ -162,6 +182,98 @@ property_blueprints:
     type: boolean
     configurable: true
     default: true
+  - name: rds_broker_db_subnet_group_name
+    type: string
+    configurable: true
+    optional: false
+  - name: rds_broker_vpc_security_group_id
+    type: string
+    configurable: true
+    optional: false
+  - name: rds_broker_publicly_accessible
+    type: boolean
+    configurable: true
+    default: false
+  - name: rds_broker_multi_az
+    type: selector
+    configurable: true
+    optional: false
+    default: enabled
+    option_templates:
+      - name: enabled
+        select_value: enabled
+      - name: disabled
+        select_value: disabled
+        property_blueprints:
+          - name: availability_zone
+            type: string
+            configurable: true
+            optional: true
+  - name: rds_broker_plan_small_db_instance_class
+    type: string
+    configurable: false
+    optional: false
+    default: db.r3.large
+  - name: rds_broker_plan_small_allocated_storage
+    type: integer
+    configurable: false
+    optional: false
+    default: 10
+  - name: rds_broker_plan_small_storage_type
+    type: string
+    configurable: false
+    optional: false
+    default: standard
+  - name: rds_broker_plan_small_storage_type_description
+    type: string
+    configurable: false
+    optional: false
+    default: Magnetic storage
+  - name: rds_broker_plan_medium_db_instance_class
+    type: string
+    configurable: false
+    optional: false
+    default: db.r3.xlarge
+  - name: rds_broker_plan_medium_allocated_storage
+    type: integer
+    configurable: false
+    optional: false
+    default: 100
+  - name: rds_broker_plan_medium_storage_type
+    type: string
+    configurable: false
+    optional: false
+    default: gp2
+  - name: rds_broker_plan_medium_storage_type_description
+    type: string
+    configurable: false
+    optional: false
+    default: General purpose SSD-backed storage
+  - name: rds_broker_plan_large_db_instance_class
+    type: string
+    configurable: false
+    optional: false
+    default: db.r3.2xlarge
+  - name: rds_broker_plan_large_allocated_storage
+    type: integer
+    configurable: false
+    optional: false
+    default: 500
+  - name: rds_broker_plan_large_storage_type
+    type: string
+    configurable: false
+    optional: false
+    default: io1
+  - name: rds_broker_plan_large_storage_type_description
+    type: string
+    configurable: false
+    optional: false
+    default: Provisioned IOPS storage (1000 IOPS)
+  - name: rds_broker_plan_large_storage_iops
+    type: integer
+    configurable: false
+    optional: false
+    default: 1000
 
   - name: sqs_broker_organization
     type: string
@@ -368,6 +480,16 @@ job_types:
         label: Broker Auth Credentials
 
     manifest: |
+      multi_az_manifest: &multi_az_manifest
+        multi_az: <%= if "(( .properties.rds_broker_multi_az.value ))" == "enabled" then true else false end %>
+        availability_zone: (( .properties.rds_broker_multi_az.disabled.availability_zone.value ))
+      common_rds_properties: &common_rds_properties
+        auto_minor_version_upgrade: true
+        copy_tags_to_snapshot: true
+        publicly_accessible: (( .properties.rds_broker_publicly_accessible.value ))
+        db_subnet_group_name: (( .properties.rds_broker_db_subnet_group_name.value ))
+        vpc_security_group_ids:
+          - (( .properties.rds_broker_vpc_security_group_id.value ))
       rds-broker:
         log_level: "(( .properties.rds_broker_log_level.value ))"
         username: "(( broker_auth_credentials.identity ))"
@@ -378,8 +500,280 @@ job_types:
         db_prefix: "(( .properties.rds_broker_prefix.value ))"
         allow_user_provision_parameters: (( .properties.rds_broker_allow_user_provision_parameters.value ))
         allow_user_update_parameters: (( .properties.rds_broker_allow_user_update_parameters.value ))
+        allow_user_bind_parameters: (( .properties.rds_broker_allow_user_bind_parameters.value ))
         catalog:
           services:
+            - id: 2ae1df05-bd36-49ec-8fda-60bc59bd3faa
+              name: rds-aurora
+              description: AWS RDS Aurora service
+              bindable: true
+              tags:
+                - aurora
+                - mysql
+                - relational
+              metadata:
+                displayName: AWS RDS Aurora
+                imageUrl: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAAAAACPAi4CAAACK0lEQVRYw+3VXU+ScRzGcd9PdfBjUhpkLWfNuUUamhO8s5YloyeyEt3yoXkijS1yE0OmbcWKDmyVQ4r6BywzsWBzFYQThTYqLCkyEuTm6qQ8Q9w4ae6+XsDn7Nq3CAWuSAAEQAAEYHMC2Ww2WxDwtVHpLwhwEekLAtRUWgOMXrM2dc81cw4kBjhuOPVcp9PpwunRo9zdzBfdrVbudi5gQXSwnXzQ0P4jJOnaVcafEN9sI4tFWUf0eojOqkTtQRJfLi9ezgEYacJDzbymNJWkGr6LshPDzm4yA2dIn6ram1yVk5eO8yM0nQNQEBGVxTV7AJKjh/hL4rqTZM5cIXUGxft4XCQ3dcCSC5inqv5+FbnWgHTl6YydzPfo8CrASRZjInq3HnCOngJeql4DMort1bvpKhERDXpKdkql74PrAPxLBuA3Y9NugE3Bz7Bie5Rw+hhjjIXw/eH9KH6yt4iwpf/9TLGBAgGzyFcYIHdKgIUU8CE5n3F//GUyJZBYCjlgM01vBAheSG6dRWcUaAhoVfpJmc1+wO9Rql9w15+1PMkP8C12mAf/AUPosADjxzxKJNsQtxrzA3FRraJhB/8X+AxuFohUvjIgO1KyTbYBYKw3EgnXj3dGAWlAC5xyAK5DUwYsNkbB8gOp8k8AxlSO86E7WwJawFPrneGcHgO+VcxMyluX8wHhnjQA9K30VdwwRq0A3ijqnZh7DDyQNf3ojQlhEQABEAAB2NzAH/mNMsRSl0sEAAAAAElFTkSuQmCC
+                longDescription: AWS RDS Aurora service
+                providerDisplayName: Amazon Web Services
+                documentationUrl: https://aws.amazon.com/documentation/rds/
+                supportUrl: https://forums.aws.amazon.com/forum.jspa?forumID=60
+              plan_updateable: true
+              plans:
+                - id: caf83c0b-087c-4f4e-9dba-610120eadd4c
+                  name: bronze
+                  description: AWS RDS Aurora - (( .properties.rds_broker_plan_small_db_instance_class.value ))
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS Aurora DB Cluster"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_small_db_instance_class.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_small_db_instance_class.value ))
+                    engine: aurora
+                    <<: *common_rds_properties
+                    multi_az: false
+                - id: 80e048ac-cad0-455b-8344-7e96a7cf6ca6
+                  name: silver
+                  description: AWS RDS Aurora - (( .properties.rds_broker_plan_medium_db_instance_class.value ))
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS Aurora DB Cluster"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))
+                    engine: aurora
+                    <<: *common_rds_properties
+                    multi_az: false
+                - id: 6f1d974f-62e0-4327-9f43-46a0c2ac3ebb
+                  name: gold
+                  description: AWS RDS Aurora - (( .properties.rds_broker_plan_large_db_instance_class.value ))
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS Aurora DB Cluster"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_large_db_instance_class.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_large_db_instance_class.value ))
+                    engine: aurora
+                    <<: *common_rds_properties
+                    multi_az: false
+            - id: ce71b484-d542-40f7-9dd4-5526e38c81ba
+              name: rds-mysql
+              description: AWS RDS MySQL service
+              bindable: true
+              tags:
+                  - mysql
+                  - relational
+              metadata:
+                displayName: AWS RDS MySQL
+                imageUrl: data:image/png;base64,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
+                longDescription: AWS RDS MySQL service
+                providerDisplayName: Amazon Web Services
+                documentationUrl: https://aws.amazon.com/documentation/rds/
+                supportUrl: https://forums.aws.amazon.com/forum.jspa?forumID=60
+              plan_updateable: true
+              plans:
+                - id: 5b8282cf-a669-4ffc-b426-c169a7bbfc71
+                  name: 5.6-bronze
+                  description: AWS RDS MySQL 5.6 - (( .properties.rds_broker_plan_small_db_instance_class.value )) - (( .properties.rds_broker_plan_small_allocated_storage.value ))Gb
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS MySQL 5.6 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_small_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_small_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_small_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_small_db_instance_class.value ))
+                    engine: MySQL
+                    engine_version: 5.6.23
+                    allocated_storage: (( .properties.rds_broker_plan_small_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_small_storage_type.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+                - id: b4943c34-fd33-47a6-8f0b-eb4f462fd746
+                  name: 5.6-silver
+                  description: AWS RDS MySQL 5.6 - (( .properties.rds_broker_plan_medium_db_instance_class.value )) - (( .properties.rds_broker_plan_medium_allocated_storage.value ))Gb SSD
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS MySQL 5.6 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_medium_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_medium_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))
+                    engine: MySQL
+                    engine_version: 5.6.23
+                    allocated_storage: (( .properties.rds_broker_plan_medium_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_medium_storage_type.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+                - id: 7e47cd05-625e-415d-bafd-09fbb0eb9ed8
+                  name: 5.6-gold
+                  description: AWS RDS MySQL 5.6 - (( .properties.rds_broker_plan_large_db_instance_class.value )) - (( .properties.rds_broker_plan_large_allocated_storage.value ))Gb SSD
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS MySQL 5.6 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_large_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_large_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_large_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_large_db_instance_class.value ))
+                    engine: MySQL
+                    engine_version: 5.6.23
+                    allocated_storage: (( .properties.rds_broker_plan_large_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_large_storage_type.value ))
+                    iops: (( .properties.rds_broker_plan_large_storage_iops.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+            - id: 0c1647b1-6c12-4311-ad27-897db74dc285
+              name: rds-mariadb
+              description: AWS RDS MariaDB service
+              bindable: true
+              tags:
+                  - mariadb
+                  - mysql
+                  - relational
+              metadata:
+                displayName: AWS RDS MariaDB
+                imageUrl: data:image/png;base64,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
+                longDescription: AWS RDS MariaDB service
+                providerDisplayName: Amazon Web Services
+                documentationUrl: https://aws.amazon.com/documentation/rds/
+                supportUrl: https://forums.aws.amazon.com/forum.jspa?forumID=60
+              plan_updateable: true
+              plans:
+                - id: a8a33f61-8492-4024-8cae-e210ce9cf34b
+                  name: 10.0-bronze
+                  description: AWS RDS MariaDB 10.0 - (( .properties.rds_broker_plan_small_db_instance_class.value )) - (( .properties.rds_broker_plan_small_allocated_storage.value ))Gb
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS MariaDB 10.0 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_small_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_small_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_small_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_small_db_instance_class.value ))
+                    engine: MariaDB
+                    engine_version: 10.0.17
+                    allocated_storage: (( .properties.rds_broker_plan_small_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_small_storage_type.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+                - id: 27766c1c-ad0c-4467-a04f-37aed25ee6db
+                  name: 10.0-silver
+                  description: AWS RDS MariaDB 10.0 - (( .properties.rds_broker_plan_medium_db_instance_class.value )) - (( .properties.rds_broker_plan_medium_allocated_storage.value ))Gb SSD
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS MariaDB 10.0 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_medium_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_medium_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))
+                    engine: MariaDB
+                    engine_version: 10.0.17
+                    allocated_storage: (( .properties.rds_broker_plan_medium_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_medium_storage_type.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+                - id: 0a93e267-7a20-43a9-ad8c-0429df1db58a
+                  name: 10.0-gold
+                  description: AWS RDS MariaDB 10.0 - (( .properties.rds_broker_plan_large_db_instance_class.value )) - (( .properties.rds_broker_plan_large_allocated_storage.value ))Gb SSD
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS MariaDB 10.0 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_large_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_large_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_large_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_large_db_instance_class.value ))
+                    engine: MariaDB
+                    engine_version: 10.0.17
+                    allocated_storage: (( .properties.rds_broker_plan_large_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_large_storage_type.value ))
+                    iops: (( .properties.rds_broker_plan_large_storage_iops.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+            - id: a2c9adda-6511-462c-9934-b3fd8236e9f0
+              name: rds-postgres
+              description: AWS RDS PostgreSQL service
+              bindable: true
+              tags:
+                - postgres
+                - postgresql
+                - relational
+              metadata:
+                displayName: AWS RDS PostgreSQL
+                imageUrl: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAA/CAYAAABQHc7KAAAQsklEQVR42t1bCViV5bYm55QcykZLu7fzVLeySbtXj2iePGoeJ46mHkXUzq1EKeWAmgpqqJgTZuCAqImKgYiKmiMOCAKCIwICAgIyyTzPwzrrXfw/bRE2e2+t59D3POvZsPf/f//3vftb07vWNjLSbbRh6cNi06ZNG0djY2MXyJNPPunM/2/g91ezzGP5G0s3LfO8xvIl37u1e/fu7i+++OLBHj16HOFX765du+7CfPz59zzn2mefffbnnj17nuX/I1hSWfJYSlmqFClgSWeJ4/n8nn/+eY927dp9x/9/yPKE0WMcr7P4sCSwlLDUslADwXuVLLksMSweLP9QgFOHGUsUS34j9zeUGvVvBoWGDh1KFhYW5OjoSO7u7rRjxw5atGgRmZub0/vvv9/wPoCyjeWpR9l0K5YB+MZZ7r300kv0wQcf0JgxY+Shc+fOJTs7O3n94osvaNq0aTRhwgQaNmwYffjhh9SrVy/q1KkTFnOVxZ7Fhb+ditdee42GDBlCM2bMoOXLl8tGfHx8aP/+/bRx40aysrKiSZMmyVy2trbk6+tLRUVFVFtbS5VV1VRUWk65haWUX1RKpeUVVFVdTVVVVRQaGkpr1qyhyZMn03vvvYdnA4xzLMPNzMxeNgSA71nKn3jiidoFCxbIIsrKyuRhNTU1pDmwOEg1L6ayslKuKy4uppSUFLK0tKSOHTvidNSePn2aSkpKqKKiQq7HKKuopMT7uZRVUEw1yjyYX30G/j8WdJtM7dxo4NwtNHDOFjJRBH8P4vcsNhykmHuZ9feWlpZSWloamZiYqKeyuFWrVnP02fxMHKW3336bzpw5IxurqKymy5FJtMbjAn2x7gCN5QUNX7CDTJe40T+W76N/rvWiha4naOuRYPIPu0vZ+cX1ABUUFFBiYqL8XVpWSQf8wmTRf7VxpT4zf6yX/pbONH7Zbprv8gsdDYyknMISuQfPPn0lhqZ97/nA9Q3lb9+yWmw/QYnpuXJfZmYmTZkyhXjzOA3JLG80t3EYDmsYGBxTLLyquoZ+CYqkITbbtD68MZlkv5cycotkMTi+G7396SML/eYwc/iZfK/GMghVVFhSRgt5g/8327nZ+6w2HaHYlEz+8mro1KlThC+T91XduXNnsyZ3z1a0Nx/5In6lrKwsKiguE0R1eWBjMuuHQ1TOCwcIXzkeNGgOSF8LJ/pqgzdFJWUImDdiU2jCd3ubve8T620UFJEoqnH16lXivQGECvYwQ5rCYAJQWr9+vdy01tPP4EWbfLNZ9LKcdXyOs4/B82jKqMU/UXJmnoBQzMbwr/Ncm73n47lb6cadFNkPbFnr1q0BwtGmjv/xd999tzYvL49RTqUBvAlDFtrPchP5XIpgK11Ji9guPI7NqzKRv/njl29TNRu7I/wM2I3m7hls5UK/BN8WWwYvxvvMZvnvhgBM46NBkZGRgjB0yNBFwiBWsM7jyMJyP04A6lTiRza2QeIC76bnPGRMG5PP1+yXU3Dp0iU1Zlmoufm2OBYvvPAC5ebmimvqZ6DeQ3YeDxUQjwRGUN/HvHlNCWavhAEwmrv2U/YQcLMw7ErAtFkTgN4s8b179xZ/HxJ175EWlpKVT3Gp2WKE+vyGAMBDZOYXUVp2AQ2dt13rtYPYFtTU1MUZiCx5v8c0ATBnyRk0aJAEMZ7nbxq8qPFL98hD1nv5/aabV2Xyin3i6gJuJWi9Dp4MAGAgquX9XtMEYD6ivhEjRkgk57jf8MX/4B0gxs/MweN3AQCCSBHu1nxV0880mbO5HgBOugCAvyYAdggZR40aJaGu/W5fA62/M4Wy+sTz8ceR+70AgMHGCAxv+hTAUMIGlJeXqzZgryYASFaq4SIAwJKfThm0kMH/cqGkjFwK5uDj99q86uuRWkBmbmg84Bq9eJcAgJBcAWCVJgArEfubmpoKALY7Thq0kOHzt3O4Ws5xfAT97ywn+gsDMtp2l/juOc5HyPLHw/R3zh10cVtNCRKgMbwZ6y3H6GJYPMWlZMmJg+fCOHv1TpO2ArYpICBAdYOWmgAg/q/49NNPxQb8wDG7IYszZ70XX3vrLgVFJlAC++jisnKNzK4uJ0jJzJcQW9/5h3LkF3I7iVPiumwyJjmTzl6LpXPXYylPSZyuNOHBoCa4x97enhRS5c+aAIyFFxgwYIB4Ae+LtwwCYK6ii+pANnf4UjhZbz5K45bu5qzRnVyOBks+j89GLtqp1/wzOR9AZogQ24ZPALJD81WectoO+YfLM0+GRjd673duZwSAiRMnksIsvdSQ8UkCkYA8PtBAHV6264wsAhGa14WbErsjaoML2n3qCkUm3CengwG080SoWOTlehpbn4AIPupVNH7JbjoVGiOESG5BCZna7RZ1wPA4d6PRe50OXRIAFPboXkPKDLTVxVdeeYWQB2TmFRkEwCr3c7KIn3iDfRv44C0+QZTOAcvNuFT+Nk7Ldek5hXrNj3Ud49RcdHrlPvZWZ2iq4m6hVhhrPM43em/0vQy6fPkytW3bFgB4NcoAPfXUU5SdnS1ImRiQCKkqsLEJG/LnrzcLGLDaqk34xNpF5/lh7HyvPWzkoAIqw/SVo/dDn09nVcHnoOsUD2DZGABDwZxER0fLRFM5zNQXgP9fe0Du3ewTqD2ZYcnIK5RrzVbq/pzzN+IoNiX7offhbTBgbIc2SJE/YnBgKJHjKKlwzeLFi99pig8oXr16tUzmsPes3gCA5sJwZn1rVp8v1RktGDNd59/g5S/fJIzpA1TYwp0yF1zwQ+mzvTt7ogoKDg5WCZEwbZRYCI4JhmcTxkSbfOt6XO5dv/9is9duO3pZrrXbqXvQNf37/eIF3E5eecg9qicA6qD5GUgdBEBgnZXj/4M2AH5kNRBC5GZcmv5GcN955fSca/ZaB8VgrnQ/p/P8YIZz2OpHJKQ/YKMGW22td70IxjRtQ7RCo4ENUmoGI7UBMA6EqJubG1VwRKhvxAb3hrF4e/ORJHJ4jCV6nAAwVLEc+SGYcvTyf2Cj6gBjrb4/e+MhUZmoqCiCgVeKNW21AWDCUjZz5ky5sam4uilRgxFrHfQaGZwwTxwk6fMM+PM6er2CT8GvbBNOBgZco/re7tNXRS1QaFHqAz20cuJTp079E1vKgnfeeUcA2KID06IpCEkxLBn55q6N4KAI459rvPR6Rn/LTULY1NF2v4IXFJEg7+09c72eEY5LzaJr166RsbExAAhvtl44b968Tmwps2As0tPT6U5yll6LuxKdLIuY2YgvfpCd2VKfH8CC62trpnLeX8JR4MmQ6PqAy+9mXST487k6AJwPBcozRo4cKcava9eue3StCqEaS15eXhKujl+2R+eFqYuwctZOqIK4wEjNyjeMFGU5ywERSBBwfXgvKrHuRG06HEh/4eAK2WF8fLzq+kgp1Oo0/sRSNHr0aJnwWkyyzgTpv1ifoTquxy5rvc7R66LQ2sv3+BqcFg+Ys1lqihkcHk/hYAq+HmPprtMCDtYxa9YsNfVdMXjw4Db61AbPdOjQQVLjYk49danCqHqH+P56bAp9ZOHU6DV4H4lLTkExZ4M/PRIRcuBCmGz0VGhd9ApQP+O14mRBhV999VUAcIeli76V4QU4OiEhIaIGC3UsbmBzsO4A7cv1Bxqnp9lP49s6GBD+yEyQzZajsj48DyMkKkkiS2SjmzZtUkPflYY0SyA9rpk/f75M7OWnO0uMctW9jDwqKCkj2x2nHjgJ+BvsLT4ztOrUMM739rslrDAKMVA9gOvt7a1mfbcnTJjwZIOst5WuINx+5plnpE6QnKmfsVqw7bgEK1iMw75z9SBMVYxfaPS9x8oJItkBCLlFJVL4QCOHYvjWK10ptixuLBdYTrBMYemgdfedO3deiknYNVIFW9SvmnFtD2RnbIVv3U0XNwQdRRq7/ZcQYZowfK/eEa7Q5DGcAsiKPWfrI8G7d+8SKlxYO9QYRZAuXbrQc889JzYBr0pIbKMVAHNz807o5enYsSP5+/tLDW7Y/O06Legw6zcMEupwsMTIxDS7SuCistkIYs5HNYROhwIoS6MZA5ReTEyMlMPDwsLkb7jDpKQkMYx4RaAHT8fySnNq4AkkHRwcpFECR7u5BVmzYaqqqhFe4c0336xvXnr55ZfpwoULskjYiKSMujK3+9nrBm9+xpr9AnRecSm5+14jL/YKGbmF9QUQtcUGgOcVltaTJnDx2oiRhmQpqTEB/K62BY2128V6WCqtKUpHRr2g6QJ8I2zDtFWeNGzBdkri+cDsguo2BAAwT9jUQYXE7atUgGas9qQNB/xp8Y6TUg9AhXqt5wW5Fv1D3bp1w5rKmnWPbEFb88sG1qNaT09PJddvvGwGDgAdXIWFhdIFhi6t4cOH06pVq+jw4cOUn59P/uz/x7DuqyXu89fj5J6J9nsNAuDnszdkTQ0DL7ThjOAIERWuo0GRFJ+WQ8UlJYTGjzfeeAObL1SaQXQanVkie/bsScnJyVKJHfHtzgZp6iYJgBA4ff7552RmZibkqjpwTFEv1GRyTJfultOCdjdQ5oYAcDggop4IQUU6ODKRwuLTJER+QAXYLqxYsUKzj3CpXkFBjx49rGFRoQo43tH3MoV9RUxv7+ZLtxMzKCEhQQweBECA88M3vJlj84Wux2moBreAbDE1q0AWjhqB6RLDADhxOUo2CWMHm5Oamiqlr+vXr4u9cXV1JaT2ffr0gUdAZ2kg78Xum2++aa9vYNRaqabWfPbZZ0Iwag7oVb9+/QThr7/+uq5fkHUd/AB8PxIqlKbWefpRWlYdfZ2Tk0N+fn6Uxyfg7wYCgAYoDE1j24jA2iexODxquyy6LcPBHKO4sG7dOgoPD5eQc+DAgWrYSe3atSPVXqhHsC4e+BUwfFsowqDV9VEACItP1yx3a7bsQsdjlWbPvizPPq7e4efbtGlzUen1rdZ4YAEfsSCFckpr3769NCh6eHhIMTIwMFBe0a+3bNkycYm4FzwdABhnIAB32bihnU9Zy/8ojU9djH7L8dZbbxnzy3+xfMCCzuxRyoONlTgbtJOjQkERwFBF6diEpOAVuQaKmuOWuBkEAMBD47TSNf4fN3qymLKsgytVdNCKpf/06dPfVsPs/MJiBmCXQaRIFdsZNFfzXJlGLWnY2toiBCUbGxsGoIjG2ekfDk+ydxe7olHsbDmDN94dAFhbWxsMAGoQ6DxX0t47LQqA2bNnG6sus4BVYLwBKgCOAj4fzZ0NO77+44cSYktMgV7iKSvc9QYgnCO+oKAgMawcdp82aoEjo3///uLHLfQswHxstVVSYLhZRKi9evXa0xIBuPT666/XldL0bMrCjzTQyu/k5CRu9emnn97YEgH4EvqL7BG/DtEHAPT7IMFiW6LGFRNbIgAInspu3LhBuQXFejVVq03SSLuVSLRbSwTgGfzeT80bbHWsEqOJE/kF+hmRojfs+m5JA8mJy9ixYyV7BM8w1la7O5y8fJ80SiG/R67B9weztDNqwaNnhw4dil1c6np80EbXMDNENRi/IsOvxlDwALOE+EHJK8yN/gDjEPQYmSKIFBCaN+NThecLjEgQa490Gk3O9+/flzRa+dlszIgRI9q3+N2zK3yTX26Cfkd/EvgF0OhxcXHyCl/PyROhi5X9fS37/ZN8/WglK/3DDOTw5/GbhSZYHbyfqFR3uhj9QQdqeJ8gPmCZo6TOFizTWT5m6f5bPfjf9dGSlnLSEoEAAAAASUVORK5CYII=
+                longDescription: AWS RDS PostgreSQL service
+                providerDisplayName: Amazon Web Services
+                documentationUrl: https://aws.amazon.com/documentation/rds/
+                supportUrl: https://forums.aws.amazon.com/forum.jspa?forumID=60
+              plan_updateable: true
+              plans:
+                - id: d03b544e-3be5-4aca-bb3b-11544247f313
+                  name: 9.4-bronze
+                  description: AWS RDS PostgreSQL 9.4 - (( .properties.rds_broker_plan_small_db_instance_class.value )) - (( .properties.rds_broker_plan_small_allocated_storage.value ))Gb
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS PostgreSQL 9.4 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_small_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_small_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_small_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_small_db_instance_class.value ))
+                    engine: postgres
+                    engine_version: 9.4.4
+                    allocated_storage: (( .properties.rds_broker_plan_small_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_small_storage_type.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+                - id: 65cfcd68-625d-4635-a828-4ccef50af986
+                  name: 9.4-silver
+                  description: AWS RDS PostgreSQL 9.4 - (( .properties.rds_broker_plan_medium_db_instance_class.value )) - (( .properties.rds_broker_plan_medium_allocated_storage.value ))Gb SSD
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS PostgreSQL 9.4 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_medium_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_medium_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_medium_db_instance_class.value ))
+                    engine: postgres
+                    engine_version: 9.4.4
+                    allocated_storage: (( .properties.rds_broker_plan_medium_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_medium_storage_type.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
+                - id: 8f8d8ed7-ddd3-4b1f-befa-976cf7fc4116
+                  name: 9.4-gold
+                  description: AWS RDS PostgreSQL 9.4 - (( .properties.rds_broker_plan_large_db_instance_class.value )) - (( .properties.rds_broker_plan_large_allocated_storage.value ))Gb SSD
+                  metadata:
+                    bullets:
+                      - "Dedicated AWS RDS PostgreSQL 9.4 DB Instance"
+                      - "DB Instance Class: (( .properties.rds_broker_plan_large_db_instance_class.value ))"
+                      - "Allocated Storage: (( .properties.rds_broker_plan_large_allocated_storage.value ))Gb"
+                      - "(( .properties.rds_broker_plan_large_storage_type_description.value ))"
+                  free: true
+                  rds_properties:
+                    db_instance_class: (( .properties.rds_broker_plan_large_db_instance_class.value ))
+                    engine: postgres
+                    engine_version: 9.4.4
+                    allocated_storage: (( .properties.rds_broker_plan_large_allocated_storage.value ))
+                    storage_type: (( .properties.rds_broker_plan_large_storage_type.value ))
+                    iops: (( .properties.rds_broker_plan_large_storage_iops.value ))
+                    <<: *common_rds_properties
+                    <<: *multi_az_manifest
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
@@ -590,7 +984,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.rds_broker_organization.value ))"
@@ -910,7 +1304,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.sqs_broker_organization.value ))"
@@ -998,7 +1392,7 @@ job_types:
                 - "s3"
               metadata:
                 displayName: "AWS S3"
-                imageUrl: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSgBBwcHCggKEwoKEygaFhooKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKP/AABEIAEAAQAMBEQACEQEDEQH/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+gEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoLEQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APqmgAoAoa/qaaNot7qMsbSJaxNKUU4LYHSplLlTZdKHtJqC6ny/42+Kuu+J45LZCthp78GCE5LD/abqfwxXnVK8p6dD6TD5fSo67s6Hwl411fQYIUhm8+2CgmGbkdOx6iuaniZ0nZbHsYnK6GLjeSs+6PePCutLr+iQagsJh8zIKFs4IOOtevRqe1gpHxeNwrwlZ0m72NatTkCgDF8Z6/F4X8NXmsTwvPHbbMxoQC251Ucn3aoqT5I8xtQoutUVNPc8y0j4y3N1GJ7jSovJcnaqSEMADjriuB45xlZo+ihw/GpTUlOzL3in4j6Pq3g7WLUpc21zLbMqq6blJI6Aj+oFW8ZCcWtmYLI8Rh6indNI+aK5D1DvLb/j3i/3R/KuZ7nuQ+FHpfhj4n+H/Cvha3sbxrqe+RmLQwRZxk5GWbA/ImvTw9eMKaTPkc0wFWvipSjtoUJvjxNc30MOnaMkcTOAWnlLNj8BVSxjWyMqOTKUkpy3PW/BniKPxNpBvYoHgKSGF0Y5+YAHg+nzCuihWVaPMkefmGCeCq+zbvdXMD46f8ks1v8A7Yf+j46MR/DYsu/3mPz/ACZ89aB/yCYP+Bf+hGvEqfEfe4X+Gi7PEs8LxOSFYYOOtSnbU3lFSVmc5eeFEkyYr6ZR6OAR+mK2jXt0PPqZepbSZh263llIVjvZl2nGAeD+BrVuMuhxQVSk7KTJ55pJ5N8z73IwWIAz+VSklsXKTm7yJ9J/5CVt/vilLZlUf4kfU+o/gh/yKl3/ANfr/wDouOu7Afw36/5Hi8R/7zH/AAr82TfHT/klmt/9sP8A0fHW+I/hs83Lv95j8/yZ89aB/wAgmD/gX/oRrxKnxH3uF/hosaixSxnZSQwU4IqY7mtV2g2jjGmlfO6RyD6sa6bI8dzk92dpDDE8EReNGO0dVB7VzN6nsRimldHLa5GkeoyLGoVcDgVvDY8zEpKo0iPSf+Qlbf74py2ZFH+JH1PqP4If8ipd/wDX6/8A6LjruwH8N+v+R4vEf+8x/wAK/Nk3x0/5JZrf/bD/ANHx1viP4bPNy7/eY/P8mfPWgf8AIJg/4F/6Ea8Sp8R97hf4aLOoqz2M6oCWKkACpjua1U3BpHFtbzJndE4x6qa6bo8hwkt0dpDPEkEYeVFIUcFh6VzNO568ZRSV2ctrciS6jI0bBlwORW8FZHmYhqVRtEek/wDIStv98U5bMij/ABI+p9R/BD/kVLv/AK/X/wDRcdd2A/hv1/yPF4j/AN5j/hX5sm+On/JLNb/7Yf8Ao+Ot8R/DZ5uXf7zH5/kz560D/kEwf8C/9CNeJU+I+9wv8NF6WRYo2kc4VRkmpSvobykoq7NPR7bStS27dbtAxONmCrfk2P5VtGjfdnnzzC20TP1nwHbQPI8WuW4zyEkUk/8Ajuf5Vq1GPU44e0qu6izh7+1azungd0cr/EmcH6ZANSnfYqUHB2kP0n/kJW3++KUtmVR/iR9T6j+CH/IqXf8A1+v/AOi467sB/Dfr/keLxH/vMf8ACvzZ1fizQrfxN4evNIvHkjguQoLx/eUqwYEfiorrnBTjys8WhVdGaqR6HmmkfBp7RPIuNWVoEY7WSL5iCc85OBXA8Dd3bPoYcQKnTUYw19S/4r+Hmh6R4L1i5VJ7i5itndJJZPunHYLgfnmreEpwi3uznWdYnEVIwdkn2X+Z8xVxnrneW/8Ax7xf7o/lXM9z3IfCj1Dwr8NPDvinwpBeX8E8V85YG4glKtweODlf0r1MNQhOkmz5DNcdVoYuUYvTQo3HwH8i+im0zWcxq4JS4i5A+o6n8BTlg77Myo5zytOcdux6t4P8Ow+GdJNlBNJNvkMru+BliAOB2HyiuihRVGPKjz8fjZY2r7SStpY3K2OIKAKGvaZHrOjXunTO0cdzE0TOvVc9xUyjzKxdObpzU10PmXxj8IvEGgeZNZp/alkvPmW6neB7p1/LNefPDyjtqfR0MxpVdHozf8KeBdZ1uCB1gNrbFR+9nBUdOw6muanhalR9kevic2w+GjZu77I908LaMmgaLBp6TNMI8kuRjJJyeK9ejT9lBRPjMbini6zqtWua1aHKFAH/2Q=="
+                imageUrl: "data:image/png;base64,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"
                 longDescription: "Amazon Simple Storage Service (S3)"
                 providerDisplayName: "Amazon Web Services"
                 documentationUrl: "https://aws.amazon.com/documentation/s3/"
@@ -1229,7 +1623,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.s3_broker_organization.value ))"
