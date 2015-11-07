@@ -38,11 +38,15 @@ function delete_broker_space() {
     cf target -o "${BROKER_APP_ORG}"
 
     if cf spaces | grep ^${BROKER_APP_SPACE}; then
-      cf delete-space "${BROKER_APP_SPACE}" -f
-    fi
+      cf target -s "${BROKER_APP_SPACE}"
 
-    if [ "${BROKER_APP_ORG}" != "system" ]; then
-        cf delete-org ${BROKER_APP_ORG} -f
+      if cf apps | grep "No apps found"; then
+        cf delete-space "${BROKER_APP_SPACE}" -f
+
+        if [ "${BROKER_APP_ORG}" != "system" ]; then
+            cf delete-org ${BROKER_APP_ORG} -f
+        fi
+      fi
     fi
   fi
 }
