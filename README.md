@@ -55,6 +55,7 @@ Update the [handcraft.yml](https://github.com/cf-platform-eng/aws-broker-boshrel
 ```
 git clone https://github.com/cf-platform-eng/aws-broker-boshrelease.git
 cd aws-broker-boshrelease
+bundle install
 bundle exec vara build-pivotal .
 ```
 
