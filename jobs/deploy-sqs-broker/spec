@@ -39,8 +39,8 @@ properties:
     description: "SQS Broker catalog"
     default: {}
 
-  sqs-broker.cf.api_endpoint:
-    description: "CF API endpoint"
+  sqs-broker.cf.api_url:
+    description: "CF API URL"
   sqs-broker.cf.skip_cert_verify:
     description: "Whether to verify SSL certs when making API requests"
     default: false

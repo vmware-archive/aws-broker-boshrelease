@@ -8,8 +8,8 @@ templates:
   bin/destroy.erb: bin/run
 
 properties:
-  cloudformation-broker.cf.api_endpoint:
-    description: "CF API endpoint"
+  cloudformation-broker.cf.api_url:
+    description: "CF API URL"
   cloudformation-broker.cf.skip_cert_verify:
     description: "Whether to verify SSL certs when making API requests"
     default: false

@@ -8,8 +8,8 @@ templates:
   bin/destroy.erb: bin/run
 
 properties:
-  rds-broker.cf.api_endpoint:
-    description: "CF API endpoint"
+  rds-broker.cf.api_url:
+    description: "CF API URL"
   rds-broker.cf.skip_cert_verify:
     description: "Whether to verify SSL certs when making API requests"
     default: false

@@ -6,7 +6,7 @@ export PATH=/var/vcap/packages/cf-cli/bin:$PATH
 
 CF_COLOR=false
 
-CF_API_ENDPOINT="<%= p('cloudformation-broker.cf.api_endpoint') %>"
+CF_API_URL="<%= p('cloudformation-broker.cf.api_url') %>"
 CF_ADMIN_USER="<%= p('cloudformation-broker.cf.admin_username') %>"
 CF_ADMIN_PASSWORD="<%= p('cloudformation-broker.cf.admin_password') %>"
 
@@ -15,7 +15,7 @@ BROKER_APP_SPACE="<%= p('cloudformation-broker.cf.app.space') %>"
 BROKER_APP_NAME="<%= p('cloudformation-broker.cf.app.name') %>"
 
 function authenticate_and_target() {
-  cf api "${CF_API_ENDPOINT}" <% if p('cloudformation-broker.cf.skip_cert_verify') %>--skip-ssl-validation<% end %>
+  cf api "${CF_API_URL}" <% if p('cloudformation-broker.cf.skip_cert_verify') %>--skip-ssl-validation<% end %>
   cf auth "${CF_ADMIN_USER}" "${CF_ADMIN_PASSWORD}"
 }
 

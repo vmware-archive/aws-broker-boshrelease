@@ -775,7 +775,7 @@ job_types:
                     <<: *common_rds_properties
                     <<: *multi_az_manifest
         cf:
-          api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+          api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
           admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
@@ -982,7 +982,7 @@ job_types:
     manifest: |
       rds-broker:
         cf:
-          api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+          api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
           admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
@@ -1095,7 +1095,7 @@ job_types:
                     receive_message_wait_time_seconds: "(( .properties.sqs_broker_receive_message_wait_time_seconds.value ))"
                     visibility_timeout: "(( .properties.sqs_broker_visibility_timeout.value ))"
         cf:
-          api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+          api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
           admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
@@ -1302,7 +1302,7 @@ job_types:
     manifest: |
       sqs-broker:
         cf:
-          api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+          api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
           admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
@@ -1414,7 +1414,7 @@ job_types:
                     template_url: "https://s3.amazonaws.com/aws-cloudformation-service-broker/sample-s3-cftemplate.json"
                     timeout_in_minutes: 10
         cf:
-          api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+          api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
           admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
@@ -1621,7 +1621,7 @@ job_types:
     manifest: |
       cloudformation-broker:
         cf:
-          api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+          api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
           admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
