@@ -44,7 +44,7 @@ properties:
   sqs-broker.cf.skip_cert_verify:
     description: "Whether to verify SSL certs when making API requests"
     default: false
-  sqs-broker.cf.admin_user:
+  sqs-broker.cf.admin_username:
     description: "CF admin username"
   sqs-broker.cf.admin_password:
     description: "CF admin password"

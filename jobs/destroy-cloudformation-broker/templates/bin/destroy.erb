@@ -7,7 +7,7 @@ export PATH=/var/vcap/packages/cf-cli/bin:$PATH
 CF_COLOR=false
 
 CF_API_ENDPOINT="<%= p('cloudformation-broker.cf.api_endpoint') %>"
-CF_ADMIN_USER="<%= p('cloudformation-broker.cf.admin_user') %>"
+CF_ADMIN_USER="<%= p('cloudformation-broker.cf.admin_username') %>"
 CF_ADMIN_PASSWORD="<%= p('cloudformation-broker.cf.admin_password') %>"
 
 BROKER_APP_ORG="<%= p('cloudformation-broker.cf.app.organization') %>"

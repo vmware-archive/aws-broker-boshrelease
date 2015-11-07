@@ -7,7 +7,7 @@ export PATH=/var/vcap/packages/cf-cli/bin:$PATH
 CF_COLOR=false
 
 CF_API_ENDPOINT="<%= p('rds-broker.cf.api_endpoint') %>"
-CF_ADMIN_USER="<%= p('rds-broker.cf.admin_user') %>"
+CF_ADMIN_USER="<%= p('rds-broker.cf.admin_username') %>"
 CF_ADMIN_PASSWORD="<%= p('rds-broker.cf.admin_password') %>"
 
 BROKER_APP_SRC=/var/vcap/packages/rds-broker/src/github.com/cf-platform-eng/rds-broker

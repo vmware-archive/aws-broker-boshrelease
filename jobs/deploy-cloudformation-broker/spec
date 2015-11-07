@@ -44,7 +44,7 @@ properties:
   cloudformation-broker.cf.skip_cert_verify:
     description: "Whether to verify SSL certs when making API requests"
     default: false
-  cloudformation-broker.cf.admin_user:
+  cloudformation-broker.cf.admin_username:
     description: "CF admin username"
   cloudformation-broker.cf.admin_password:
     description: "CF admin password"

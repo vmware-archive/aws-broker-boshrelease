@@ -777,7 +777,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.rds_broker_organization.value ))"
@@ -984,7 +984,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.rds_broker_organization.value ))"
@@ -1097,7 +1097,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.sqs_broker_organization.value ))"
@@ -1304,7 +1304,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.sqs_broker_organization.value ))"
@@ -1416,7 +1416,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.s3_broker_organization.value ))"
@@ -1623,7 +1623,7 @@ job_types:
         cf:
           api_endpoint: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
           skip_cert_verify: (( ..cf.ha_proxy.skip_cert_verify.value ))
-          admin_user: "(( ..cf.uaa.admin_credentials.identity ))"
+          admin_username: "(( ..cf.uaa.admin_credentials.identity ))"
           admin_password: "(( ..cf.uaa.admin_credentials.password ))"
           app:
             organization: "(( .properties.s3_broker_organization.value ))"

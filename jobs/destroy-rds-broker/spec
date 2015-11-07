@@ -13,7 +13,7 @@ properties:
   rds-broker.cf.skip_cert_verify:
     description: "Whether to verify SSL certs when making API requests"
     default: false
-  rds-broker.cf.admin_user:
+  rds-broker.cf.admin_username:
     description: "CF admin username"
   rds-broker.cf.admin_password:
     description: "CF admin password"
