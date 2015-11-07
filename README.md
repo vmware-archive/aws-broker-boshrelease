@@ -44,15 +44,23 @@ Refer to the different broker's documentation for more details about the require
 
 ### Using [Pivotal Ops Manager](https://network.pivotal.io/products/ops-manager)
 
-### Build the Pivotal tile
+### Pivotal tile
 
-First you will need to build the Pivotal tile:
+You can deploy the AWS Service Broker using [Pivotal Ops Manager](https://network.pivotal.io/products/ops-manager). If you want modify the configuration (services, plans, ...) you will need to build your custom Pivotal tile, otherwise, just download the already existing Pivotal tile.
+
+#### Build the Pivotal tile
+
+Update the [handcraft.yml](https://github.com/cf-platform-eng/aws-broker-boshrelease/blob/master/metadata_parts/handcraft.yml) file with your modifications. Then, build the Pivotal tile:
 
 ```
 git clone https://github.com/cf-platform-eng/aws-broker-boshrelease.git
 cd aws-broker-boshrelease
 bundle exec vara build-pivotal .
 ```
+
+#### Download the Pivotal tile
+
+Download the [p-aws-broker-0.1.0.0.pivotal](https://storage.googleapis.com/pivotal/p-aws-broker-0.1.0.0.pivotal) file to your workstation.
 
 ### Upload the Pivotal tile
 
