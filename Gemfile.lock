@@ -92,11 +92,6 @@ GEM
       fog-xml (~> 0.1.1)
       ipaddress (~> 0.5)
       nokogiri (~> 1.5, >= 1.5.11)
-    fog-aliyun (0.0.10)
-      fog-core (~> 1.27)
-      fog-json (~> 1.0)
-      ipaddress (~> 0.8)
-      xml-simple (~> 1.1)
     fog-atmos (0.1.0)
       fog-core
       fog-xml
@@ -169,16 +164,13 @@ GEM
     fog-voxel (0.1.0)
       fog-core
       fog-xml
-    fog-xenserver (0.2.2)
-      fog-core
-      fog-xml
     fog-xml (0.1.2)
       fog-core
       nokogiri (~> 1.5, >= 1.5.11)
     formatador (0.2.5)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    httpclient (2.6.0.1)
+    httpclient (2.7.0.1)
     i18n (0.7.0)
     inflecto (0.0.2)
     ipaddress (0.8.0)
@@ -262,7 +254,6 @@ GEM
       recursive-open-struct (~> 0.5.0)
       ruby_vcloud_sdk (= 0.7.2)
     websocket (1.2.2)
-    xml-simple (1.1.5)
     xpath (2.0.0)
       nokogiri (~> 1.3)
 
