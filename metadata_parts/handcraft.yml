@@ -147,7 +147,7 @@ property_blueprints:
   - name: rds_broker_space
     type: string
     configurable: false
-    default: rds-broker
+    default: aws-broker
   - name: rds_broker_name
     type: string
     configurable: false
@@ -282,7 +282,7 @@ property_blueprints:
   - name: sqs_broker_space
     type: string
     configurable: false
-    default: sqs-broker
+    default: aws-broker
   - name: sqs_broker_name
     type: string
     configurable: false
@@ -341,7 +341,7 @@ property_blueprints:
   - name: s3_broker_space
     type: string
     configurable: false
-    default: s3-broker
+    default: aws-broker
   - name: s3_broker_name
     type: string
     configurable: false
