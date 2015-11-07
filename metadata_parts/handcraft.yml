@@ -504,7 +504,7 @@ job_types:
         catalog:
           services:
             - id: 2ae1df05-bd36-49ec-8fda-60bc59bd3faa
-              name: rds-aurora
+              name: aws-rds-aurora
               description: AWS RDS Aurora service
               bindable: true
               tags:
@@ -560,7 +560,7 @@ job_types:
                     <<: *common_rds_properties
                     multi_az: false
             - id: ce71b484-d542-40f7-9dd4-5526e38c81ba
-              name: rds-mysql
+              name: aws-rds-mysql
               description: AWS RDS MySQL service
               bindable: true
               tags:
@@ -631,7 +631,7 @@ job_types:
                     <<: *common_rds_properties
                     <<: *multi_az_manifest
             - id: 0c1647b1-6c12-4311-ad27-897db74dc285
-              name: rds-mariadb
+              name: aws-rds-mariadb
               description: AWS RDS MariaDB service
               bindable: true
               tags:
@@ -703,7 +703,7 @@ job_types:
                     <<: *common_rds_properties
                     <<: *multi_az_manifest
             - id: a2c9adda-6511-462c-9934-b3fd8236e9f0
-              name: rds-postgres
+              name: aws-rds-postgres
               description: AWS RDS PostgreSQL service
               bindable: true
               tags:
