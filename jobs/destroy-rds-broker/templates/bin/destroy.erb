@@ -40,6 +40,10 @@ function delete_broker_space() {
     if cf spaces | grep ^${BROKER_APP_SPACE}; then
       cf delete-space "${BROKER_APP_SPACE}" -f
     fi
+
+    if [ "${BROKER_APP_ORG}" != "system" ]; then
+        cf delete-org ${BROKER_APP_ORG} -f
+    fi
   fi
 }
 
