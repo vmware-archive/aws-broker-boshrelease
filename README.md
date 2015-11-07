@@ -21,7 +21,7 @@ To use this BOSH release, first upload it to your BOSH:
 bosh target BOSH_HOST
 git clone https://github.com/cf-platform-eng/aws-broker-boshrelease.git
 cd aws-broker-boshrelease
-bosh upload release releases/aws-broker/aws-broker-1.yml
+bosh upload release releases/aws-broker/aws-broker-2.yml
 ```
 
 #### Create a BOSH deployment manifest

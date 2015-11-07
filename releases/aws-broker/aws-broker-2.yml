@@ -1,0 +1,105 @@
+---
+packages:
+- name: bosh-helpers
+  version: f469b9d9cd643a3e706ca661deea572de6e522b4
+  fingerprint: f469b9d9cd643a3e706ca661deea572de6e522b4
+  sha1: 0238d1e267d513a4ca18291f22494523bb0c26f5
+  dependencies: []
+- name: broker-registrar
+  version: 46213225d775263932e072a461e524baf0994967
+  fingerprint: 46213225d775263932e072a461e524baf0994967
+  sha1: 4b02f72e2be88c9979d30e92fb57040dba86dee6
+  dependencies:
+  - ruby
+- name: cf-cli
+  version: ff0cbf4a34778cefacf234743977ce9c0ff4abc3
+  fingerprint: ff0cbf4a34778cefacf234743977ce9c0ff4abc3
+  sha1: 83623c03cb02cad92fbd24bf42b476a6858963f9
+  dependencies: []
+- name: cloudformation-broker
+  version: 066e23923603ef6c129d1534454f727ae61a1650
+  fingerprint: 066e23923603ef6c129d1534454f727ae61a1650
+  sha1: 249e6dc2427b2025720b9e9db69a9a06a64ad91b
+  dependencies:
+  - golang
+- name: golang
+  version: 5519bcd760fbf15e8c2a0562da4cf2e00d846df9
+  fingerprint: 5519bcd760fbf15e8c2a0562da4cf2e00d846df9
+  sha1: 57719c2670ba498cd54e25b99c743186e3c2551e
+  dependencies: []
+- name: rds-broker
+  version: be3da5320796cc08486682a464e309e91ea71dcf
+  fingerprint: be3da5320796cc08486682a464e309e91ea71dcf
+  sha1: 53c499781249946c1e886bbc1dcf67dbde5f2168
+  dependencies:
+  - golang
+- name: route-registrar
+  version: 3b2cf70c426b6e95afea6948553cd71c03bd9dc1
+  fingerprint: 3b2cf70c426b6e95afea6948553cd71c03bd9dc1
+  sha1: d524a939ac92746d909dd8b28949d82484e33ae4
+  dependencies:
+  - golang
+- name: ruby
+  version: 5714e1404330f00a9f6520f88e44b899c949f636
+  fingerprint: 5714e1404330f00a9f6520f88e44b899c949f636
+  sha1: 3794407e8e7f1279733faa9c30bf7db8d5de46d5
+  dependencies: []
+- name: sqs-broker
+  version: e6a1e3693d7b68448cb8108422a31511b3afbe89
+  fingerprint: e6a1e3693d7b68448cb8108422a31511b3afbe89
+  sha1: 94344265b85f578f797531c28a53802468071ad7
+  dependencies:
+  - golang
+jobs:
+- name: broker-deregistrar
+  version: 30015fee8a0532ac7e5b72080dca95e85b810eda
+  fingerprint: 30015fee8a0532ac7e5b72080dca95e85b810eda
+  sha1: 39dcdd0636db005e10fa3b725663fec115e987ab
+- name: broker-registrar
+  version: 9f566e65b9c68b62521b77ea3105afe9f654396b
+  fingerprint: 9f566e65b9c68b62521b77ea3105afe9f654396b
+  sha1: c60bc19351696e63e6898704182d14c67602f24d
+- name: cloudformation-broker
+  version: 6983e1f3aded998ebba1b16ae2d98c46c1e19890
+  fingerprint: 6983e1f3aded998ebba1b16ae2d98c46c1e19890
+  sha1: eb47e9bc418e9d3e8c4926ca1e589c5061f87755
+- name: deploy-cloudformation-broker
+  version: 64019d86848c03e0ffac33901efb82d8d361701b
+  fingerprint: 64019d86848c03e0ffac33901efb82d8d361701b
+  sha1: 1c1a7ac76840901dd2d893ad20a694c8c147b6f1
+- name: deploy-rds-broker
+  version: 06a49d93eb86198ec4996de506ee840bab2a342c
+  fingerprint: 06a49d93eb86198ec4996de506ee840bab2a342c
+  sha1: 9765af68ccd937bbd637738b0e05ec679974184c
+- name: deploy-sqs-broker
+  version: 592883906dc9f98467633806046b723e41997915
+  fingerprint: 592883906dc9f98467633806046b723e41997915
+  sha1: 4fc5b2677c6e29683f6ccdce3622b9533bc2568f
+- name: destroy-cloudformation-broker
+  version: bdcaa4f9e913aa236e0bfededcd2c9efa8c51a0c
+  fingerprint: bdcaa4f9e913aa236e0bfededcd2c9efa8c51a0c
+  sha1: 5538680a9d512531d5d3ac57a1dfb998aa485666
+- name: destroy-rds-broker
+  version: e207a7f58241e6741280bdd01335042d86b65f65
+  fingerprint: e207a7f58241e6741280bdd01335042d86b65f65
+  sha1: 249b799cf79303a639136d724371d8ca85197e11
+- name: destroy-sqs-broker
+  version: d2aa210cf29fe416da6df8fd02e18f46d9071362
+  fingerprint: d2aa210cf29fe416da6df8fd02e18f46d9071362
+  sha1: 70b37222b47bee5901f45c83558a686de755b5cf
+- name: rds-broker
+  version: ec6189446d28ee816ba49243bd1a0b11aa8c0c01
+  fingerprint: ec6189446d28ee816ba49243bd1a0b11aa8c0c01
+  sha1: 7af75128b89e02001777c9071cd17df4cc206abe
+- name: sqs-broker
+  version: 257997d944c9589e2158e632e9f99e6e95eccca2
+  fingerprint: 257997d944c9589e2158e632e9f99e6e95eccca2
+  sha1: 3ddb1d43b775acab68295d4b82c38da8b9a4e75d
+license:
+  version: 2f84235b3f0ec1695c78a590f33b5309c933a837
+  fingerprint: 2f84235b3f0ec1695c78a590f33b5309c933a837
+  sha1: fe6c5ee987004d8974b61fea8a4d0559154c6c63
+commit_hash: 1e1ad44f
+uncommitted_changes: true
+name: aws-broker
+version: '2'
