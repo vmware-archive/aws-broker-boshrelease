@@ -11,6 +11,10 @@ This is NOT presently a production ready AWS Service Broker BOSH release. This i
 
 ## Usage
 
+### AWS credentials and permissions
+
+This BOSH release requires an AWS user with some advanced privileges. Instead of using your primary AWS admin user, it is recommended to create a new AWS user (with the proper access keys), create an specific policy based on the [iam_policy.json](https://github.com/cf-platform-eng/aws-broker-boshrelease/blob/master/iam_policy.json) file, and then attach the policy to the user.
+
 ### Using BOSH
 
 #### Upload the BOSH release
@@ -44,11 +48,11 @@ Refer to the different broker's documentation for more details about the require
 
 ### Using [Pivotal Ops Manager](https://network.pivotal.io/products/ops-manager)
 
-### Pivotal tile
+#### Pivotal tile
 
 You can deploy the AWS Service Broker using [Pivotal Ops Manager](https://network.pivotal.io/products/ops-manager). If you want modify the configuration (services, plans, ...) you will need to build your custom Pivotal tile, otherwise, just download the already existing Pivotal tile.
 
-#### Build the Pivotal tile
+##### Build the Pivotal tile
 
 Update the [handcraft.yml](https://github.com/cf-platform-eng/aws-broker-boshrelease/blob/master/metadata_parts/handcraft.yml) file with your modifications. Then, build the Pivotal tile:
 
@@ -59,11 +63,11 @@ bundle install
 bundle exec vara build-pivotal .
 ```
 
-#### Download the Pivotal tile
+##### Download the Pivotal tile
 
 Download the [p-aws-broker-0.1.0.0.pivotal](https://storage.googleapis.com/pivotal/p-aws-broker-0.1.0.0.pivotal) file to your workstation.
 
-### Upload the Pivotal tile
+#### Upload the Pivotal tile
 
 Upload the Pivotal tile `p-aws-broker-0.1.0.0.pivotal` to your Pivotal Ops Manager, configure it, and deploy.
 
