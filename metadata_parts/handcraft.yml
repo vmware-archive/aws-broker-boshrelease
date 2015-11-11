@@ -57,10 +57,10 @@ form_types:
         label: "Allow user provision parameters"
         description: "Allow or disallow users to send arbitrary parameters on provision calls"
       - reference: .properties.rds_broker_allow_user_update_parameters
-        label: "Allow user provision parameters"
+        label: "Allow user update parameters"
         description: "Allow or disallow users to send arbitrary parameters on update calls"
       - reference: .properties.rds_broker_allow_user_bind_parameters
-        label: "Allow user provision parameters"
+        label: "Allow user bind parameters"
         description: "Allow or disallow users to send arbitrary parameters on bind calls"
       - reference: .properties.rds_broker_db_subnet_group_name
         label: "AWS RDS DB Subnet Group"
@@ -94,7 +94,7 @@ form_types:
         label: "Allow user provision parameters"
         description: "Allow or disallow users to send arbitrary parameters on provision calls"
       - reference: .properties.sqs_broker_allow_user_update_parameters
-        label: "Allow user provision parameters"
+        label: "Allow user update parameters"
         description: "Allow or disallow users to send arbitrary parameters on update calls"
       - reference: .properties.sqs_broker_delay_seconds
         label: "Delay"
@@ -123,7 +123,7 @@ form_types:
         label: "Allow user provision parameters"
         description: "Allow or disallow users to send arbitrary parameters on provision calls"
       - reference: .properties.s3_broker_allow_user_update_parameters
-        label: "Allow user provision parameters"
+        label: "Allow user update parameters"
         description: "Allow or disallow users to send arbitrary parameters on update calls"
 
 property_blueprints:
