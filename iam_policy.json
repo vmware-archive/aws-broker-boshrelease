@@ -58,6 +58,7 @@
     },
     {
       "Action": [
+        "s3:Get*",
         "s3:CreateBucket",
         "s3:DeleteBucket"
       ],
