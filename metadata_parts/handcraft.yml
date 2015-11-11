@@ -1,6 +1,6 @@
 ---
 name: p-aws-broker
-product_version: 0.1.0.0
+product_version: 0.1.1.0
 metadata_version: "1.6"
 label: "AWS Service Broker"
 description: "AWS Service Broker"
@@ -13,7 +13,7 @@ requires_product_versions:
 
 provides_product_versions:
   - name: p-aws-broker
-    version: 0.1.0.0
+    version: 0.1.1.0
 
 post_deploy_errands:
   - name: deploy-rds-broker

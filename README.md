@@ -65,11 +65,11 @@ bundle exec vara build-pivotal .
 
 ##### Download the Pivotal tile
 
-Download the [p-aws-broker-0.1.0.0.pivotal](https://storage.googleapis.com/pivotal/p-aws-broker-0.1.0.0.pivotal) file to your workstation.
+Download the [p-aws-broker-0.1.1.0.pivotal](https://storage.googleapis.com/pivotal/p-aws-broker-0.1.1.0.pivotal) file to your workstation.
 
 #### Upload the Pivotal tile
 
-Upload the Pivotal tile `p-aws-broker-0.1.0.0.pivotal` to your Pivotal Ops Manager, configure it, and deploy.
+Upload the Pivotal tile `p-aws-broker-0.1.1.0.pivotal` to your Pivotal Ops Manager, configure it, and deploy.
 
 ## Contributing
 
