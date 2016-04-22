@@ -1,6 +1,0 @@
----
-name: cloudformation-broker
-dependencies:
-  - golang
-files:
-  - github.com/cf-platform-eng/cloudformation-broker/**/*

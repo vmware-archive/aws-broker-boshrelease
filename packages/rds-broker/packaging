@@ -7,7 +7,7 @@ export PATH=${GOROOT}/bin:${PATH}
 
 # Build AWS RDS Service Broker package
 echo "Building AWS RDS Service Broker..."
-PACKAGE_NAME=github.com/cf-platform-eng/rds-broker
+PACKAGE_NAME=github.com/alphagov/paas-rds-broker
 mkdir -p ${BOSH_INSTALL_TARGET}/src/${PACKAGE_NAME}
 cp -a ${BOSH_COMPILE_TARGET}/${PACKAGE_NAME}/* ${BOSH_INSTALL_TARGET}/src/${PACKAGE_NAME}
 export GOPATH=${BOSH_INSTALL_TARGET}:${BOSH_INSTALL_TARGET}/src/${PACKAGE_NAME}/Godeps/_workspace
