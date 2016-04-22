@@ -4,6 +4,6 @@
 [submodule "src/broker-registrar"]
 	path = src/broker-registrar
 	url = https://github.com/pivotal-cf/broker-registrar.git
-[submodule "src/github.com/cf-platform-eng/rds-broker"]
-	path = src/github.com/cf-platform-eng/rds-broker
-	url = https://github.com/cf-platform-eng/rds-broker.git
+[submodule "src/github.com/alphagov/paas-rds-broker"]
+	path = src/github.com/alphagov/paas-rds-broker
+	url = https://github.com/alphagov/paas-rds-broker.git

@@ -3,4 +3,4 @@ name: rds-broker
 dependencies:
   - golang
 files:
-  - github.com/cf-platform-eng/rds-broker/**/*
+  - github.com/alphagov/paas-rds-broker/**/*
